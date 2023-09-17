@@ -2,6 +2,7 @@ package utilities
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -50,15 +51,19 @@ func ConsumeMessage(ctx context.Context, channel *amqp.Channel, queueName string
 		log.Error().Msgf("Error occurred while publishing message: %s", err)
 	}
 	var forever chan struct{}
-
+	var cveInfo []CVEInformation
 	go func() {
 		for d := range message {
-			log.Info().Msgf("Received a message: %s", d.Body)
+			err = json.Unmarshal([]byte(d.Body), &cveInfo)
+			if err != nil {
+				log.Error().Msgf("Error unmarshalling data")
+			}
+			log.Info().Msgf("Received a message: %s", cveInfo)
 			fmt.Println()
 		}
 	}()
 
-	log.Info().Msg(" [*] Waiting for messages. To exit press CTRL+C")
+	log.Info().Msg(" [*] Waiting for messages.")
 	<-forever
 }
 
@@ -74,12 +79,11 @@ func SubscribeMessage(ctx context.Context) error {
 		return err
 	}
 	defer channel.Close()
-	queueName := "test-queue"
-	if err := DeclareQueue(channel, queueName); err != nil {
+	if err := DeclareQueue(channel, QueueName); err != nil {
 		return err
 	}
-	ConsumeMessage(ctx, channel, queueName)
+	ConsumeMessage(ctx, channel, QueueName)
 
-	log.Info().Msg(fmt.Sprintf("Successfully established connection and published message to queue '%s'", queueName))
+	log.Info().Msg(fmt.Sprintf("Successfully established connection and published message to queue '%s'", QueueName))
 	return nil
 }

@@ -95,21 +95,3 @@ type CVSS3xEnvironmentalScore struct {
 	AvailabilityRequirement    string `json:"availabilityRequirement"`
 	IntegrityRequirement       string `json:"integrityRequirement"`
 }
-
-type CommonAppInformation struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Identifier  string `json:"identifier"`
-	Description string `json:"description"`
-	Version     string `json:"version"`
-	BuildNumber string `json:"build_number"`
-}
-
-type CommonHealthCheckResponse struct {
-	ServiceName string `json:"serviceName"`
-	Status      string `json:"status"`
-}
-
-type APIDoc struct {
-	Link string `json:"link"`
-}
